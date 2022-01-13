@@ -21,6 +21,7 @@ def run_kafka_server():
 
 def feed():
     producer = run_kafka_server()
+    print("Generating data in a second")
     producer.generate_data()
 
 

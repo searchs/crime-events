@@ -4,6 +4,10 @@ import time
 
 
 class ProducerServer(KafkaProducer):
+    """Producve Kafka messages to a topic from the JSON file
+        :param input_file:  JSON file for source of events(calls)
+        :param topic: Kafka topic to write events to
+    """
     def __init__(self, input_file, topic, **kwargs):
         super().__init__(**kwargs)
         self.input_file = input_file

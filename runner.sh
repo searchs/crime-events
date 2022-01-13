@@ -19,10 +19,11 @@ bin/kafka-server-start.sh config/server.properties
 touch consumer_server.py
 
 # On Workspace
-bin/kafka-console-consumer.sh --bootstrap-server localhost:<your-port-number> --topic <your-topic-name> --from-beginning
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092  --topic sf.crime.calls --from-beginning
 
 # Consume
-/usr/bin/kafka-consumer-console --bootstrap-server localhost:9092 --topic daily-incidents --from-beginning
+#Test pub
+/usr/bin/kafka-consumer-console --bootstrap-server localhost:9092 --topic sf.crime.calls --from-beginning
 
 
 
