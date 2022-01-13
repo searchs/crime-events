@@ -4,4 +4,4 @@ python-dateutil
 pathlib
 black==21.12b0
 jq
-kafka
+kafka-python
