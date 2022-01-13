@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Setup Environment
-sh /startup.sh
+sh startup.sh
 
 
 # ZooKeeper operations
@@ -19,17 +19,24 @@ bin/kafka-server-start.sh config/server.properties
 touch consumer_server.py
 
 # On Workspace
-bin/kafka-console-consumer.sh --bootstrap-server localhost:<your-port-number> --topic <your-topic-name> --from-beginning
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092  --topic sf.crime.calls --from-beginning
+
+
+#Create topic manually
+/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 3 --partitions 2   --topic sf.crime.calls
+
+#Topics list details
+/bin/kafka-topics --zookeeper localhost:2181 --list
+
+
+$ bin/kafka-console-consumer.sh --topic sf.crime.calls quickstart-events --from-beginning --bootstrap-server localhost:9092
 
 # Consume
-/usr/bin/kafka-consumer-console --bootstrap-server localhost:9092 --topic daily-incidents --from-beginning
+#Test pub
+/usr/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic sf.crime.calls --from-beginning
 
-
-
-
-
-# Test Kafka servver
-bin/kafka-console-consumer.sh --bootstrap-server localhost:<your-port-number> --topic <your-topic-name> --from-beginning
+# Test Kafka server
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic sf.crime.calls --from-beginning
 
 
 spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.4 --master local[*] data_stream.py
