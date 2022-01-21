@@ -50,7 +50,7 @@ With all set, run the program by following these steps:
 This returns just 10 messages.  You should see messages like this:
 [consumer_screenshot]
 * ![Producer generation messages](/images/producer_messages_1.png "Producing messages screenshot")
-* ![Producer generation messages - formatted with jq](/images/producer_messages_formatted.png "Producing messages formatted screenshot")
+* ![Producer generation messages formatted with jq](/images/producer_messages_formatted.png "Producing messages formatted screenshot")
 * Perform data transformation and analytics by running the data_stream.py file.   
 ```spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.4 --master local[*] data_stream.py```
 For the sake of this project, the transformation/analytics results is display on the console.  Below is the screenshot of 
