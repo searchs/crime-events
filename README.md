@@ -50,7 +50,7 @@ With all set, run the program by following these steps:
 This returns just 10 messages.  You should see messages like this:
 [consumer_screenshot]
 * ![Producer generation messages](/images/producer_messages_1.png "Producing messages screenshot")
-* ![Producer generation messages - formatted with jq](/images/producer_messages_formatted.png "Producing messages formatted screenshot")
+* ![Producer generation messages - formatted with jq](/images/producer_messages_formated.png "Producing messages formatted screenshot")
 * Perform data transformation and analytics by running the data_stream.py file.   
 ```spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.4 --master local[*] data_stream.py```
 For the sake of this project, the transformation/analytics results is display on the console.  Below is the screenshot of 
@@ -63,9 +63,26 @@ that can then serve as a data source for a visualization tool.  That is out of s
 * of the report visually by visiting http://localhost:3000 while the transformation is in progress.  It should look like this:
 ![SparkUI Job listing](images/SparkUI_Jobs_listing.png "SparkUI with jobs listing" )
 
+
+## Optimizing Spark config
+__How did changing values on the SparkSession property parameters affect the throughput and latency of the data?__
+There is a correlation between the Spark config parameter  ```maxOffsetsPerTrigger``` and the ```processedRowsPerSecond  and numInputRows```. 
+The higher the ```maxOffsetsPerTrigger``` , the higher the  values of ```processedRowsPerSecond  and numInputRows```  which is the throughput.
+The screenshots below:
+### With maxOffsetsPerTrigger set to 200
+![maxOffsetsPerTrigger=200](images/progress_report_200_200_1.png "maxOffsetsPerTrigger set to 200" )
+
+### With maxOffsetsPerTrigger set to 300
+![maxOffsetsPerTrigger=300](images/progress_report_100_200_1.png "maxOffsetsPerTrigger set to 300" )
+
+After changing the processedRowsPerSecond changed so if we have a higher value in this value the throughput is better. Also the numInputRows changed.
+
+3. What were the 2-3 most efficient SparkSession property key/value pairs? Through testing multiple variations on values, how can you tell these were the most optimal?
+
+
+
 ## Help
-If running Kafka in single mode and the replication factor is set to 1, some reports have surfaced on StackOverflow about 
-message brokers not meeting the required replication factor of 3.  The fix is simply to add ```offsets.topic.replication.factor=1```
+While running Kafka in single mode if you encounter the ```message brokers not meeting the required replication factor of 3.``` error. Simply to add ```offsets.topic.replication.factor=1```
 to Kafka server configuration (found in config.server.properties)
 
 ```

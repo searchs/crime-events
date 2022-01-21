@@ -16,10 +16,7 @@ sh startup.sh
 /usr/bin/kafka-topics --zookeeper localhost:2181 --list
 
 # Consume messages from a topic --optional parameter: --max-message 10
-/usr/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic crimes.calls --from-beginning
-
-# Test Kafka server
-bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic sf.crime.calls --from-beginning
+/usr/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic crimes.calls --from-beginning --max-message 10
 
 #Run transformation and analytics on consumed messages
 spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.4 --master local[*] data_stream.py
