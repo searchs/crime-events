@@ -1,30 +1,38 @@
-from kafka.producer import KafkaProducer
+from kafka import KafkaProducer
 import json
 import time
+import datetime
+import logging
+
+from confluent_kafka.admin import AdminClient, NewTopic
+
+logger = logging.getLogger(__name__)
 
 
 class ProducerServer(KafkaProducer):
-    """Produce Kafka messages to a topic from the JSON file
-    :param input_file:  JSON file for source of events(calls)
-    :param topic: Kafka topic to write events to
-    """
-
     def __init__(self, input_file, topic, **kwargs):
         super().__init__(**kwargs)
         self.input_file = input_file
         self.topic = topic
 
-    # TODO we're generating a dummy data - Done
-    def generate_data(self):
-        with open(self.input_file) as f:
-            json_data = json.load(f)
-            for line in json_data:
-                message = self.dict_to_binary(line)
-                # TODO send the correct data - Done
-                self.send(topic=self.topic, value=message)
-                time.sleep(1)
+    def read_data_file(self):
+        """Read json data file."""
+        with open(self.input_file, "r") as src:
+            data = json.load(src)
+        return data
 
-    # TODO fill this in to return the json dictionary to binary - Done
+    # TODO fill this in to return the json dictionary to binary
     @staticmethod
     def dict_to_binary(json_dict):
         return json.dumps(json_dict).encode("utf-8")
+
+    # TODO we're generating a dummy data
+    def generate_data(self):
+        """Send messages to Kafka topic"""
+        with open(self.input_file, "r") as f:
+            calls = json.load(f)
+            for call in calls:
+                message = self.dict_to_binary(call)
+                # TODO send the correct data
+                self.send(topic=self.topic, value=message)
+                time.sleep(1)
