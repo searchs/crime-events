@@ -2,6 +2,7 @@ findspark
 pyspark
 python-dateutil
 pathlib
-black==21.12b0
+black
 jq
 kafka-python
+confluent-kafka
