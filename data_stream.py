@@ -37,8 +37,10 @@ def run_spark_job(spark):
             .option("kafka.bootstrap.servers", BOOTSTRAP_SERVERS)
             .option("startingOffsets", "earliest")
             .option("subscribe", KAFKA_TOPIC)
-            .option("maxOffsetsPerTrigger", 200)
-            .load())
+            .option("maxOffsetsPerTrigger", 100)
+            .option("maxRatePerPartition", 200)
+            .load()
+    )
 
     # Show schema for the incoming resources for checks - Done
     df.printSchema()
@@ -48,39 +50,42 @@ def run_spark_job(spark):
     kafka_df = df.selectExpr("CAST(value AS STRING) as calls", "timestamp")
     kafka_df.printSchema()
 
-    service_table = kafka_df \
-        .select(from_json(col("calls"), schema).alias("DF"), col("timestamp")) \
-        .select("DF.*", "timestamp")
+    service_table = kafka_df.select(
+        from_json(col("calls"), schema).alias("DF"), col("timestamp")
+    ).select("DF.*", "timestamp")
 
-    logger.info("\nService Table Schema\n")
     service_table.printSchema()
 
     # TODO select original_crime_type_name and disposition
-    distinct_table = (service_table.select(
+    distinct_table = service_table.select(
         col("original_crime_type_name"),
         col("disposition"),
         col("call_date_time"),
-        col("timestamp")
-    ).withWatermark("call_date_time", "5 minutes"))
+        col("timestamp"),
+    ).withWatermark("call_date_time", "5 minutes")
 
     distinct_table.printSchema()  # check it conforms to expected schema
 
-    # count the number of original crime type to
+    # count the number of original crime type [top crimes query]
     agg_df = (
-        distinct_table
-            .groupBy("original_crime_type_name", window("call_date_time", "60 minutes"))
+        distinct_table.groupBy(
+            "original_crime_type_name", window("call_date_time", "60 minutes")
+        )
             .count()
-            .orderBy("count", ascending=False))
+            .orderBy("count", ascending=False)
+    )
 
     # TODO Q1. Submit a screen shot of a batch ingestion of the aggregation
     # TODO write output stream
-    query = (agg_df
-             .writeStream
-             .outputMode("complete")
-             .format("console")
-             .option("truncate", "false")
-             .option("numRows", 30)
-             .start())
+
+    logger.info("=== TOP CRIMES IN SANFRANCISCO =====")
+    query = (
+        agg_df.writeStream.outputMode("complete")
+            .format("console")
+            .option("truncate", "false")
+            .option("numRows", 30)
+            .start()
+    )
 
     # TODO attach a ProgressReporter
     query.awaitTermination()
@@ -94,8 +99,6 @@ def run_spark_job(spark):
 
     # TODO rename disposition_code column to disposition
     radio_code_df = radio_code_df.withColumnRenamed("disposition_code", "disposition")
-
-    radio_code_df.show(4)
 
     # TODO join on disposition column
     join_query = (
